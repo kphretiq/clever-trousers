@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import uuid
 import bcrypt
 from flask import request, render_template, flash
 from App.Models import *
@@ -12,12 +13,11 @@ def initializer_routes(app, db):
         check for secret key: fail if mismatch
         set default role = "root"
         set default email address
-
+        create api_key
+        create user_token
         """
 
         error = None
-
-        # Big fails first
         try:
             User.query.one()
             flash("BEGONE!")
@@ -43,20 +43,27 @@ def initializer_routes(app, db):
                         error="Not even a single letter? Sheesh.")
 
             try:
+                api_key = str(uuid.uuid4()).encode("utf-8")
+                api_secret = str(uuid.uuid4()).encode("utf-8")
 
+                session_token = str(uuid.uuid4()).encode("utf-8")
                 password = request.form["password"].encode("utf-8")
-                salt = bcrypt.gensalt()
-                hashed = bcrypt.hashpw(password, salt)
-
+                hashed = bcrypt.hashpw(password, bcrypt.gensalt()) 
                 user = User(
                         username = request.form["username"].encode("utf-8"),
                         password = hashed,
                         email = "private@dont.bug.me",
                         role = "root",
                         active = True,
+                        session_token = session_token,
+                        api_key = api_key,
                         )
+
                 db.session.add(user)
                 db.session.commit()
+                flash("keep track of these keys!")
+                flash("api_key: %s"%api_key)
+                flash("api_secret: %s"%api_secret)
                 return render_template("error.html", error = "Root user created. Restart app!")
 
             except Exception as db_error:
