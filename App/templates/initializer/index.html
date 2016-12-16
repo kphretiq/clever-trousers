@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Initializer</title>
+	</head>
+	<body>
+
+		{% with messages = get_flashed_messages() %}
+			{% if messages %}
+			<ul class=flashes>
+				{% for message in messages %}
+				<li>{{ message }}</li>
+				{% endfor %}
+			</ul>
+			{% endif %}
+		{% endwith %}
+
+		{% if not error == "Key Mismatch" %}
+
+		{% if error %}
+		<p class="error">{{ error }}</p>
+		{% endif %}
+
+		<form id="initializer-form" method="POST">
+			<label for="initializer-username">Username</label>
+			<input
+		  		type="text"
+	  			id="initializer-username"
+	  			name="username"
+	  			placeholder="lordhighadmin"
+	  			required></input>
+
+			<br />
+			<label for="initializer-password">Password</label>
+			<input
+		  		type="password"
+	  			id="initializer-password"
+	  			name="password"
+	  			placeholder="A nice, long passphrase."
+	  			required></input>
+
+			<br />
+			<label for="initializer-repeat-password">Repeat Password</label>
+			<input
+		  		type="password"
+	  			id="initializer-repeat-password"
+	  			name="repeat-password"
+	  			placeholder="The same nice, long passphrase."
+	  			required></input>
+
+			<br />
+			<button type="submit">submit</button>
+			{% endif %}
+
+		</form>
+	</body>
+</html>
+
+

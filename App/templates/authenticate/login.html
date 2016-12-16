@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Login</title>
+	</head>
+	<body>
+
+		{% with messages = get_flashed_messages() %}
+			{% if messages %}
+			<ul class=flashes>
+				{% for message in messages %}
+				<li>{{ message }}</li>
+				{% endfor %}
+			</ul>
+			{% endif %}
+		{% endwith %}
+
+		{% if error %}
+		<p class="error">{{ error }}</p>
+		{% endif %}
+
+		<form id="tester-form" method="POST">
+			<input type="hidden", value="{{ next or '' }}" name="next">
+			<label for="tester-username">Username</label>
+			<input
+		  		type="text"
+	  			id="tester-username"
+	  			name="username"
+	  			placeholder="pathetiq kphretiq"
+	  			required></input>
+
+			<br />
+			<label for="tester-password">Password</label>
+			<input
+		  		type="password"
+	  			id="tester-password"
+	  			name="password"
+	  			placeholder="A nice, long passphrase."
+	  			required></input>
+
+			<br />
+			<button type="submit">submit</button>
+
+		</form>
+	</body>
+</html>
+
+
