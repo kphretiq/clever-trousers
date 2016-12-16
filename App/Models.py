@@ -11,7 +11,6 @@ class User(db.Model):
     username = db.Column(db.String(72), unique=True, nullable=False)
     password = db.Column(db.String(72), nullable=False)
     email = db.Column(db.String(255), unique=True, nullable=False)
-    role = db.Column(db.String(16), nullable=False)
     authenticated = db.Column(db.Boolean, default=False)
     active = db.Column(db.Boolean, default=False)
     api_key = db.Column(db.String(36), nullable=False)
