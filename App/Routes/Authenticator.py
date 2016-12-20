@@ -6,6 +6,31 @@ from flask_login import  login_user, logout_user, login_required
 from App.Models import User
 from App.Routes.AuthCommon import *
 
+def user_add(db, username, password, email, role="user"):
+
+    session_token = str(uuid.uuid4()).encode("utf-8")
+    api_key = str(uuid.uuid4()).encode("utf-8")
+
+    username = username.encode("utf-8")
+    password = password.encode("utf-8")
+    email = email.encode("utf-8")
+    hashed = bcrypt.hashpw(password, bcrypt.gensalt())
+
+    user = User(
+            username = username,
+            password = hashed,
+            email = email,
+            active = True,
+            session_token = session_token,
+            api_key = api_key,
+            )
+    try:
+        db.session.add(user)
+        db.session.commit()
+        return True, "User created"
+    except Exception as error:
+        return False, error
+
 def authenticator_routes(app, db, login_manager):
 
     @login_manager.user_loader
@@ -45,6 +70,7 @@ def authenticator_routes(app, db, login_manager):
 
     @app.route("/signup", methods = ["GET", "POST"])
     def signup():
+        # TODO send confirmation email
         if request.method == "POST":
             fail = False
 
@@ -61,27 +87,13 @@ def authenticator_routes(app, db, login_manager):
                 flash("Email addresses do not match.")
 
             if not fail:
-                api_key = str(uuid.uuid4()).encode("utf-8")
-                session_token = str(uuid.uuid4()).encode("utf-8")
-                username = request.form["username"].encode("utf-8")
-                password = request.form["password"].encode("utf-8")
-                hashed = bcrypt.hashpw(password, bcrypt.gensalt())
-                user = User(
-                        username = username,
-                        password = hashed,
-                        email = email,
-                        role = "user",
-                        active = True,
-                        session_token = session_token,
-                        api_key = api_key,
-                        )
-                try:
-                    db.session.add(user)
-                    db.session.commit()
-                    flash("Signup successful.")
+                username = request.form["username"]
+                password = request.form["password"]
+                email = request.form["email"]
+                status, message = user_add(db, username, password, email)
+                flash(message)
+                if status:
                     return redirect(url_for("login"))
-                except Exception as error:
-                    flash(error)
 
         return render_template("authenticate/signup.html")
 

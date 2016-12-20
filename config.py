@@ -23,9 +23,6 @@ RFH.setFormatter(formatter)
 ########### Flask ########### 
 # required if you wish to use any sort of Authentication
 APP_SECRET_KEY = "7481bfe8-9b03-41c3-b514-5d14b961683b"
-# used by App.Admin for creating initial database. If DB already exists, running
-# the init script again does nothing, so this is kind of "meh".
-ADMIN_SECRET_KEY = "1aed2cb9-261f-4088-81dd-3d577d292c67"
 
 # Display debug information in console
 DEBUG = True

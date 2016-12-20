@@ -41,27 +41,15 @@ authenticator_routes(app, db, login_manager)
 private_routes(app, db, login_manager)
 public_routes(app, db)
 
-# If we don't have a root user, add initializer routes
-# This prevents initializer routes from being initialized after database and
-# root user have been created.
-# After app is restarted, the Routes.Initializer
-#with app.app_context():
-#    try:
-#        User.query.one()
-#    except Exception as error:
-#        app.logger.warning("Create a root user, then restart app!")
-#        from App.Routes.Initializer import initializer_routes
-#        initializer_routes(app, db)
-
+#### Command line bits
 @app.cli.command()
 @click.option("--username", default=None, help="root username")
+@click.option("--password", default=None, help="root password")
 @click.option("--email", default=None, help="root email")
-def init_root(username, email):
-    #TODO re-use user auth
+def init_root(username, email, password):
     import sys
     import getpass
-    import bcrypt
-    import uuid
+    from App.Routes.Authenticator import user_add
 
     initialized = False
     try:
@@ -74,30 +62,7 @@ def init_root(username, email):
     if initialized:
         sys.exit(1)
 
-    password = getpass.getpass("Enter password for %s: "%username).encode("utf-8")
-    password_redux = getpass.getpass("Repeat: ").encode("utf-8")
-    if not password == password_redux:
-        sys.exit("password mismatch")
-
-    api_key = str(uuid.uuid4()).encode("utf-8")
-    session_token = str(uuid.uuid4()).encode("utf-8")
-    hashed = bcrypt.hashpw(password, bcrypt.gensalt())
-    api_key_hashed = bcrypt.hashpw(api_key, bcrypt.gensalt())
-
     db.create_all()
     click.echo("initialized database")
-
-    user = User(
-            username = username,
-            password = hashed,
-            email = email,
-            session_token = session_token,
-            api_key = api_key_hashed,
-            active = True,
-            authenticated = True,
-            )
-    db.session.add(user)
-    db.session.commit()
-    click.echo("api_key: %s "%api_key)
-    sys.exit(0)
-
+    status, message = user_add(db, username, password, email, role="root")
+    sys.exit(str(message))
