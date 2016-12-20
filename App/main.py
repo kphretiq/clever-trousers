@@ -42,6 +42,7 @@ private_routes(app, db, login_manager)
 public_routes(app, db)
 
 #### Command line bits
+# TODO get values from environment
 @app.cli.command()
 @click.option("--username", default=None, help="root username")
 @click.option("--password", default=None, help="root password")
