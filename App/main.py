@@ -5,11 +5,10 @@ from flask_session import Session
 from flask_cache import Cache
 from flask_login.login_manager import LoginManager
 from flaskext.markdown import Markdown
+from flask_principal import Principal
 from App.Async.CeleryAsync import celery_async
-
 from App.Models import db
 from App.Models import User
-
 from App.Routes.Authenticator import authenticator_routes
 from App.Routes.Public import public_routes
 from App.Routes.Private import private_routes
@@ -26,7 +25,8 @@ db.init_app(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
-#login_manager.login_message = u"Why here and not the accursed initial login?"
+
+principals = Principal(app)
 
 #celery = celery_async(app)
 cache = Cache()
@@ -38,7 +38,7 @@ Session(app)
 Markdown(app, extensions=["nl2br", "fenced_code", "tables",])
 
 authenticator_routes(app, db, login_manager)
-private_routes(app, db, login_manager)
+private_routes(app, db, login_manager, principals)
 public_routes(app, db)
 
 #### Command line bits
